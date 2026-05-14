@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dieta Mensual</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #070f1c;
+  color: #e8f5e9;
+  font-family: Georgia, serif;
+  min-height: 100vh;
+  padding-bottom: 72px;
+}
+.page { max-width: 700px; margin: 0 auto; padding: 20px 14px; }
+.hidden { display: none !important; }
+
+/* HERO */
+.hero {
+  display: flex; align-items: center; gap: 16px;
+  background: linear-gradient(135deg,#1b4332,#081c15);
+  border-radius: 18px; padding: 18px 22px;
+  border: 1px solid #2d6a4f; margin-bottom: 28px;
+}
+.hero-emoji { font-size: 42px; }
+.hero-title { font-size: 26px; font-weight: 700; color: #b7e4c7; }
+.hero-sub { font-size: 12px; color: #74c69d; font-family: sans-serif; margin-top: 4px; }
+
+.titulo { font-size: 22px; color: #b7e4c7; font-weight: 700; margin-bottom: 4px; }
+.sub { font-size: 13px; color: #74c69d; font-family: sans-serif; line-height: 1.6; margin-bottom: 16px; }
+.card-lbl { font-size: 11px; color: #74c69d; text-transform: uppercase; letter-spacing: 1px; font-family: sans-serif; font-weight: 700; margin-bottom: 6px; }
+.meal-name { font-size: 15px; font-weight: 600; color: #e8f5e9; margin-bottom: 10px; }
+
+.card { background: #0b1a2e; border: 1px solid #1b4332; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+
+.sem-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.sem-label { font-size: 16px; font-weight: 700; color: #52b788; font-family: sans-serif; border-left: 4px solid #52b788; padding-left: 10px; }
+.sem-block { margin-bottom: 26px; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(130px,1fr)); gap: 8px; }
+.dia-card { background: #0b1a2e; border: 1px solid #1b4332; border-radius: 12px; padding: 12px 10px; cursor: pointer; transition: border-color .2s; }
+.dia-card:hover { border-color: #52b788; }
+.dia-dia { font-size: 10px; color: #74c69d; font-family: sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.dia-num { font-size: 12px; font-weight: 700; color: #b7e4c7; margin-bottom: 6px; font-family: sans-serif; }
+.dia-pill { font-size: 10px; color: #a8dabd; margin-bottom: 2px; font-family: sans-serif; line-height: 1.3; }
+.dia-ver { font-size: 10px; color: #52b788; margin-top: 6px; font-family: sans-serif; }
+
+.ing-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip { background: #060d1a; border: 1px solid #2d6a4f; border-radius: 8px; padding: 5px 9px; }
+.chip-name { display: block; font-size: 12px; color: #b7e4c7; font-family: sans-serif; }
+.chip-qty { display: block; font-size: 11px; color: #52b788; font-family: sans-serif; font-weight: 700; }
+
+.btn-verde { background: #1b4332; border: 1px solid #40916c; color: #74c69d; border-radius: 10px; padding: 9px 14px; cursor: pointer; font-size: 13px; font-family: sans-serif; width: 100%; }
+.btn-verde:hover { background: #2d6a4f; }
+.btn-sm { background: #1b4332; border: 1px solid #2d6a4f; color: #74c69d; border-radius: 8px; padding: 5px 11px; cursor: pointer; font-size: 12px; font-family: sans-serif; }
+.btn-cambiar { background: #1b4332; border: 1px solid #2d6a4f; color: #74c69d; border-radius: 8px; padding: 4px 10px; cursor: pointer; font-size: 12px; font-family: sans-serif; }
+.btn-copiar { background: #2d6a4f; border: none; color: #b7e4c7; border-radius: 10px; padding: 8px 14px; cursor: pointer; font-size: 13px; font-family: sans-serif; width: 100%; }
+.btn-rojo { background: none; border: 1px solid #e63946; color: #e63946; border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: 12px; margin-top: 10px; font-family: sans-serif; }
+.back-btn { background: none; border: none; color: #52b788; cursor: pointer; font-size: 14px; padding: 0 0 14px; font-family: sans-serif; display: block; }
+
+.add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.add-input { flex: 1; background: #0b1a2e; border: 1px solid #2d6a4f; border-radius: 10px; color: #e8f5e9; padding: 9px 12px; font-size: 14px; font-family: sans-serif; outline: none; }
+.add-btn { background: #2d6a4f; border: none; color: #b7e4c7; border-radius: 10px; width: 42px; font-size: 22px; cursor: pointer; }
+.empty { text-align: center; padding: 40px 0; color: #74c69d; font-family: sans-serif; }
+.cesta-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid #1b4332; }
+.chk { background: none; border: none; color: #52b788; cursor: pointer; font-size: 18px; padding: 0; }
+.cesta-name { flex: 1; font-size: 14px; font-family: sans-serif; }
+.cesta-qty { font-size: 12px; color: #74c69d; font-family: sans-serif; font-style: italic; }
+.del-btn { background: none; border: none; color: #e63946; opacity: .5; cursor: pointer; font-size: 14px; padding: 0; }
+.divider { font-size: 11px; color: #52b788; text-transform: uppercase; letter-spacing: 1px; padding: 12px 0 4px; font-family: sans-serif; }
+
+.code-box { background: #060d1a; border: 1px solid #2d6a4f; border-radius: 10px; padding: 10px 12px; font-size: 11px; font-family: monospace; color: #52b788; word-break: break-all; line-height: 1.5; max-height: 90px; overflow-y: auto; margin-bottom: 8px; margin-top: 12px; user-select: all; }
+.hint { font-size: 12px; color: #52b788; font-family: sans-serif; margin-top: 8px; line-height: 1.5; font-style: italic; }
+.sync-textarea { width: 100%; background: #060d1a; border: 1px solid #2d6a4f; border-radius: 10px; color: #e8f5e9; padding: 10px 12px; font-size: 12px; font-family: monospace; resize: vertical; outline: none; }
+.err-msg { color: #e63946; font-size: 12px; font-family: sans-serif; margin-top: 6px; }
+
+/* ── PESO ── */
+.peso-stats {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px;
+}
+.stat-box {
+  background: #0b1a2e; border: 1px solid #1b4332; border-radius: 14px;
+  padding: 14px 10px; text-align: center;
+}
+.stat-val { font-size: 22px; font-weight: 700; color: #b7e4c7; }
+.stat-lbl { font-size: 11px; color: #74c69d; font-family: sans-serif; margin-top: 3px; }
+.stat-unit { font-size: 12px; color: #52b788; font-family: sans-serif; }
+
+.peso-form {
+  background: #0b1a2e; border: 1px solid #1b4332; border-radius: 14px;
+  padding: 16px; margin-bottom: 14px;
+}
+.peso-inputs { display: flex; gap: 8px; align-items: flex-end; margin-top: 10px; }
+.peso-input-wrap { flex: 1; }
+.peso-input-wrap label { font-size: 11px; color: #74c69d; font-family: sans-serif; display: block; margin-bottom: 4px; }
+.peso-input {
+  width: 100%; background: #060d1a; border: 1px solid #2d6a4f;
+  border-radius: 10px; color: #e8f5e9; padding: 9px 12px;
+  font-size: 16px; font-family: sans-serif; outline: none; text-align: center;
+}
+.peso-input:focus { border-color: #52b788; }
+
+/* Gráfica */
+.chart-wrap {
+  background: #0b1a2e; border: 1px solid #1b4332; border-radius: 14px;
+  padding: 16px; margin-bottom: 14px; overflow: hidden;
+}
+.chart-title { font-size: 12px; color: #74c69d; font-family: sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+canvas#pesoChart { width: 100% !important; height: 180px !important; }
+
+/* Historial */
+.peso-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 0; border-bottom: 1px solid #1b4332;
+}
+.peso-fecha { font-size: 12px; color: #74c69d; font-family: sans-serif; width: 90px; flex-shrink: 0; }
+.peso-kg { font-size: 16px; font-weight: 700; color: #b7e4c7; flex: 1; }
+.peso-diff { font-size: 12px; font-family: sans-serif; width: 54px; text-align: right; flex-shrink: 0; }
+.peso-nota { font-size: 11px; color: #74c69d; font-style: italic; font-family: sans-serif; flex: 2; }
+
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); align-items: flex-end; justify-content: center; z-index: 100; }
+.overlay.active { display: flex; }
+.modal { background: #0b1a2e; border: 1px solid #2d6a4f; border-radius: 18px 18px 0 0; padding: 22px; width: 100%; max-width: 700px; max-height: 78vh; overflow-y: auto; }
+.modal-title { color: #b7e4c7; font-family: sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.swap-btn { border-radius: 12px; padding: 10px 14px; cursor: pointer; color: #b7e4c7; text-align: left; font-size: 13px; font-family: sans-serif; font-weight: 600; width: 100%; display: block; margin-bottom: 8px; }
+.swap-ings { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+.swap-ing { font-size: 10px; background: #060d1a; padding: 2px 6px; border-radius: 4px; color: #74c69d; font-weight: 400; }
+
+/* NAV */
+nav { position: fixed; bottom: 0; left: 0; right: 0; background: #060d1a; border-top: 1px solid #1b4332; display: flex; z-index: 50; }
+.nav-btn { flex: 1; background: none; border: none; color: #52b788; padding: 13px 0; cursor: pointer; font-size: 12px; font-family: sans-serif; }
+.nav-btn.active { color: #b7e4c7; border-top: 2px solid #52b788; font-weight: 700; }
+
+#toast { display: none; position: fixed; bottom: 78px; left: 50%; transform: translateX(-50%); background: #2d6a4f; color: #b7e4c7; padding: 9px 20px; border-radius: 20px; font-size: 13px; font-family: sans-serif; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,.4); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div id="v-plan" class="page"></div>
+<div id="v-dia"  class="page hidden"></div>
+<div id="v-cesta" class="page hidden"></div>
+<div id="v-peso" class="page hidden"></div>
+<div id="v-sync" class="page hidden"></div>
+
+<div id="overlay" class="overlay" onclick="cerrarModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<nav>
+  <button class="nav-btn active" id="nav-plan"  onclick="irA('plan')">📅 Plan</button>
+  <button class="nav-btn"        id="nav-cesta" onclick="irA('cesta')">🛒 Cesta</button>
+  <button class="nav-btn"        id="nav-peso"  onclick="irA('peso')">⚖️ Peso</button>
+  <button class="nav-btn"        id="nav-sync"  onclick="irA('sync')">🔄 Sync</button>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+// ─── DATOS DIETA ──────────────────────────────────────────────────────────
+
+const DESAYUNOS = [
+  { id:"b1", name:"Tortilla de huevos con queso y frutos rojos", ings:[
+    {item:"Huevos",qty:"3 uds"},{item:"Queso rallado",qty:"50 gr"},
+    {item:"Aguacate",qty:"½ unidad"},{item:"Tomate a la plancha",qty:"1 unidad"},
+    {item:"Frutos rojos",qty:"200 gr"}]},
+  { id:"b2", name:"Licuado de zanahoria con pescado blanco", ings:[
+    {item:"Zanahorias",qty:"2 uds"},{item:"Setas o champiñones",qty:"100 gr"},
+    {item:"Bacon o txistorra",qty:"50 gr"},{item:"Pescado blanco",qty:"250 gr"}]},
+  { id:"b3", name:"Caldo de hueso con cacao puro", ings:[
+    {item:"Caldo de hueso / crema de verduras",qty:"300 ml"},
+    {item:"Pescado blanco",qty:"300 gr"},{item:"Cacao puro",qty:"56 gr (2 oz)"}]},
+  { id:"b4", name:"Pan sin gluten con salmón y huevos", ings:[
+    {item:"Pan sin gluten",qty:"2 rebanadas"},{item:"Aguacate",qty:"½ unidad"},
+    {item:"Salmón ahumado o jamón ibérico",qty:"50 gr"},
+    {item:"Huevos",qty:"2 uds"},{item:"Ciruela",qty:"1 unidad"}]},
+  { id:"b5", name:"Tortilla grande con pollo y licuado", ings:[
+    {item:"Huevos",qty:"4 uds"},{item:"Aguacate",qty:"½ unidad"},
+    {item:"Pechuga de pollo",qty:"200 gr"},{item:"Licuado de zanahoria",qty:"250 ml"}]},
+  { id:"b6", name:"Yogur griego con proteína y fruta", ings:[
+    {item:"Yogur griego 0%",qty:"250 gr"},{item:"Proteína en polvo",qty:"30 gr"},
+    {item:"Frutos rojos",qty:"150 gr"},{item:"Nueces",qty:"20 gr"}]},
+  { id:"b7", name:"Revuelto de setas con jamón ibérico", ings:[
+    {item:"Huevos",qty:"3 uds"},{item:"Setas",qty:"150 gr"},
+    {item:"Jamón ibérico",qty:"50 gr"},{item:"Aguacate",qty:"½ unidad"},
+    {item:"Frutos rojos",qty:"150 gr"}]},
+];
+
+const CENAS = [
+  { id:"d1", name:"Entrecot con huevos y crema de verduras", ings:[
+    {item:"Entrecot / carne roja",qty:"200 gr"},{item:"Huevos",qty:"2 uds"},
+    {item:"Crema de verdura sin patata",qty:"300 ml"},{item:"Frutos rojos",qty:"200 gr"}]},
+  { id:"d2", name:"Keto wrap de queso cottage y pavo", ings:[
+    {item:"Queso cottage",qty:"300 gr"},{item:"Fiambre de pavo",qty:"80 gr"},
+    {item:"Tomate cherry",qty:"100 gr"},{item:"Brotes verdes",qty:"50 gr"}]},
+  { id:"d3", name:"Mejillones con yogur de oveja y cacao", ings:[
+    {item:"Mejillones",qty:"400 gr"},{item:"Jamón ibérico",qty:"100 gr"},
+    {item:"Arándanos congelados",qty:"250 gr"},{item:"Yogur de oveja",qty:"250 gr"},
+    {item:"Cacao puro",qty:"56 gr (2 oz)"},{item:"Bayas de goji",qty:"5 uds"},
+    {item:"Proteína en polvo",qty:"15 gr"}]},
+  { id:"d4", name:"Ensalada de pollo con mozzarella", ings:[
+    {item:"Pechuga de pollo",qty:"200 gr"},{item:"Mozzarella",qty:"80 gr"},
+    {item:"Tomate",qty:"1 unidad"},{item:"Lechuga",qty:"100 gr"},
+    {item:"Cebolla",qty:"½ unidad"},{item:"Pimientos rojos",qty:"½ unidad"},
+    {item:"Gazpacho",qty:"200 ml"}]},
+  { id:"d5", name:"Pizzas de arroz con pechuga de pavo", ings:[
+    {item:"Láminas de papel de arroz",qty:"4 uds"},{item:"Huevo",qty:"1 unidad"},
+    {item:"Tomate frito",qty:"100 ml"},{item:"Aceite de oliva",qty:"1 cucharada"},
+    {item:"Queso parmesano",qty:"20 gr"},{item:"Mozzarella rallada",qty:"30 gr"},
+    {item:"Calabacín",qty:"¼ unidad"},{item:"Pechuga de pavo",qty:"60 gr"},
+    {item:"Tomate cherry",qty:"5 uds"}]},
+  { id:"d6", name:"Boniato asado con jamón y huevos", ings:[
+    {item:"Boniato",qty:"400 gr"},{item:"Jamón",qty:"70 gr"},{item:"Huevos",qty:"4 uds"}]},
+  { id:"d7", name:"Salmón a la plancha con brócoli", ings:[
+    {item:"Salmón fresco",qty:"200 gr"},{item:"Brócoli",qty:"200 gr"},
+    {item:"Aceite de oliva",qty:"1 cucharada"},{item:"Limón",qty:"½ unidad"},
+    {item:"Frutos rojos",qty:"150 gr"}]},
+];
+
+const POST = [
+  {item:"Proteína en polvo",qty:"30 gr"},{item:"Creatina",qty:"5 gr"},
+  {item:"Magnesio",qty:"1 cápsula"},{item:"Vitamina B",qty:"1 cápsula"},
+];
+
+const DIAS = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────
+
+let plan   = leer("dm_plan",   crearPlan());
+let cesta  = leer("dm_cesta",  []);
+let pesos  = leer("dm_pesos",  []); // [{id, fecha, kg, nota}]
+let pesoObj= leer("dm_pesoobj",{objetivo:null});
+
+let vistaActual = "plan";
+let diaActual   = null;
+let cambioTarget= null;
+let chartInst   = null;
+
+function leer(key, fb) {
+  try { const v=localStorage.getItem(key); return v?JSON.parse(v):fb; } catch { return fb; }
+}
+function guardar() {
+  localStorage.setItem("dm_plan",    JSON.stringify(plan));
+  localStorage.setItem("dm_cesta",   JSON.stringify(cesta));
+  localStorage.setItem("dm_pesos",   JSON.stringify(pesos));
+  localStorage.setItem("dm_pesoobj", JSON.stringify(pesoObj));
+}
+function crearPlan() {
+  return Array.from({length:4},(_,s)=>Array.from({length:7},(_,d)=>{
+    const n=s*7+d;
+    return {n, desayuno:DESAYUNOS[n%DESAYUNOS.length].id, cena:CENAS[n%CENAS.length].id};
+  }));
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────
+
+function getD(id){ return DESAYUNOS.find(x=>x.id===id); }
+function getC(id){ return CENAS.find(x=>x.id===id); }
+
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.style.display="block";
+  setTimeout(()=>t.style.display="none",2500);
+}
+
+function irA(v){
+  ["plan","dia","cesta","peso","sync"].forEach(x=>{
+    document.getElementById("v-"+x).classList.toggle("hidden",x!==v);
+    const b=document.getElementById("nav-"+x);
+    if(b) b.classList.toggle("active",x===v);
+  });
+  vistaActual=v;
+  if(v==="plan")  renderPlan();
+  if(v==="cesta") renderCesta();
+  if(v==="peso")  renderPeso();
+  if(v==="sync")  renderSync();
+  updateNavCesta();
+}
+
+function updateNavCesta(){
+  const p=cesta.filter(c=>!c.done).length;
+  document.getElementById("nav-cesta").textContent = p>0?`🛒 (${p})`:"🛒 Cesta";
+}
+
+function chips(ings){
+  return ings.map(i=>`<div class="chip">
+    <span class="chip-name">${i.item}</span>
+    <span class="chip-qty">${i.qty}</span>
+  </div>`).join("");
+}
+
+function hoy(){
+  const d=new Date();
+  return d.toISOString().slice(0,10);
+}
+function fmtFecha(iso){
+  const [y,m,d]=iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
+// ─── CESTA ────────────────────────────────────────────────────────────────
+
+function addToCesta(items){
+  items.forEach(({item,qty})=>{
+    if(!cesta.find(c=>c.name===item))
+      cesta.push({id:Date.now()+Math.random(),name:item,qty,done:false});
+  });
+  guardar(); updateNavCesta(); showToast("✓ Añadido a la cesta");
+}
+function addDia(si,di){
+  const dia=plan[si][di];
+  const b=getD(dia.desayuno),d=getC(dia.cena);
+  addToCesta([...(b?.ings||[]),...(d?.ings||[]),...POST]);
+}
+function addSemana(si){
+  const all=[];
+  plan[si].forEach(dia=>{
+    const b=getD(dia.desayuno),d=getC(dia.cena);
+    all.push(...(b?.ings||[]),...(d?.ings||[]),...POST);
+  });
+  addToCesta(all);
+}
+function toggleCesta(id){
+  cesta=cesta.map(c=>c.id==id?{...c,done:!c.done}:c);
+  guardar(); renderCesta();
+}
+function borrarItem(id){
+  cesta=cesta.filter(c=>c.id!=id);
+  guardar(); renderCesta();
+}
+function borrarChecked(){
+  cesta=cesta.filter(c=>!c.done);
+  guardar(); renderCesta(); showToast("✓ Eliminados");
+}
+function addManual(){
+  const inp=document.getElementById("add-input");
+  const val=inp.value.trim(); if(!val) return;
+  cesta.push({id:Date.now(),name:val,qty:"",done:false});
+  inp.value=""; guardar(); renderCesta();
+}
+
+// ─── PESO ─────────────────────────────────────────────────────────────────
+
+function guardarPeso(){
+  const kgVal = parseFloat(document.getElementById("inp-kg").value);
+  const nota  = document.getElementById("inp-nota").value.trim();
+  const fecha = document.getElementById("inp-fecha").value || hoy();
+  if(isNaN(kgVal)||kgVal<=0){ showToast("⚠️ Introduce un peso válido"); return; }
+  // Si ya hay registro de esa fecha lo reemplaza
+  pesos = pesos.filter(p=>p.fecha!==fecha);
+  pesos.push({id:Date.now(), fecha, kg:kgVal, nota});
+  pesos.sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  document.getElementById("inp-kg").value="";
+  document.getElementById("inp-nota").value="";
+  guardar(); renderPeso(); showToast("✓ Peso guardado");
+}
+
+function borrarPeso(id){
+  pesos=pesos.filter(p=>p.id!=id);
+  guardar(); renderPeso();
+}
+
+function guardarObjetivo(){
+  const v=parseFloat(document.getElementById("inp-objetivo").value);
+  if(!isNaN(v)&&v>0){ pesoObj.objetivo=v; guardar(); renderPeso(); showToast("✓ Objetivo guardado"); }
+}
+
+function drawChart(){
+  const canvas=document.getElementById("pesoChart");
+  if(!canvas) return;
+  if(chartInst){ chartInst.destroy(); chartInst=null; }
+  if(pesos.length<1){ canvas.style.display="none"; return; }
+  canvas.style.display="block";
+  const ctx=canvas.getContext("2d");
+  const labels=pesos.map(p=>fmtFecha(p.fecha));
+  const data=pesos.map(p=>p.kg);
+  const minY=Math.floor(Math.min(...data)-2);
+  const maxY=Math.ceil(Math.max(...data)+2);
+
+  chartInst={
+    canvas, ctx, labels, data, minY, maxY,
+    draw(){
+      const W=canvas.offsetWidth||canvas.parentElement.offsetWidth||600;
+      canvas.width=W; canvas.height=180;
+      ctx.clearRect(0,0,W,180);
+      const pad={t:16,r:16,b:36,l:42};
+      const w=W-pad.l-pad.r, h=180-pad.t-pad.b;
+      const n=data.length;
+      const xStep = n>1 ? w/(n-1) : w/2;
+      const yScale= v=> pad.t + h - ((v-minY)/(maxY-minY))*h;
+
+      // grid lines
+      ctx.strokeStyle="#1b4332"; ctx.lineWidth=1;
+      for(let i=0;i<=4;i++){
+        const y=pad.t+i*(h/4);
+        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+w,y); ctx.stroke();
+        const val=(maxY-(i*(maxY-minY)/4)).toFixed(1);
+        ctx.fillStyle="#52b788"; ctx.font="10px sans-serif"; ctx.textAlign="right";
+        ctx.fillText(val,pad.l-4,y+3);
+      }
+
+      // objetivo line
+      if(pesoObj.objetivo){
+        const oy=yScale(pesoObj.objetivo);
+        ctx.strokeStyle="#e9c46a"; ctx.lineWidth=1.5; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(pad.l,oy); ctx.lineTo(pad.l+w,oy); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle="#e9c46a"; ctx.font="bold 10px sans-serif"; ctx.textAlign="left";
+        ctx.fillText("Obj. "+pesoObj.objetivo+"kg",pad.l+4,oy-4);
+      }
+
+      // line
+      ctx.strokeStyle="#52b788"; ctx.lineWidth=2.5; ctx.setLineDash([]);
+      ctx.beginPath();
+      data.forEach((v,i)=>{
+        const x=pad.l+(n===1?w/2:i*xStep), y=yScale(v);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+
+      // fill under
+      ctx.fillStyle="rgba(82,183,136,0.08)";
+      ctx.beginPath();
+      data.forEach((v,i)=>{ const x=pad.l+(n===1?w/2:i*xStep),y=yScale(v); i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+      ctx.lineTo(pad.l+(n===1?w/2:(n-1)*xStep),pad.t+h);
+      ctx.lineTo(pad.l,pad.t+h); ctx.closePath(); ctx.fill();
+
+      // dots + labels
+      data.forEach((v,i)=>{
+        const x=pad.l+(n===1?w/2:i*xStep), y=yScale(v);
+        ctx.fillStyle="#52b788"; ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle="#b7e4c7"; ctx.font="bold 10px sans-serif"; ctx.textAlign="center";
+        ctx.fillText(v+"kg",x,y-8);
+        // x label (every N if too many)
+        if(n<=10||(i%(Math.ceil(n/8))===0)){
+          ctx.fillStyle="#74c69d"; ctx.font="9px sans-serif";
+          ctx.fillText(labels[i],x,180-pad.b+14);
+        }
+      });
+    }
+  };
+  chartInst.draw();
+  // redraw on resize
+  window.addEventListener("resize",()=>{ if(chartInst) chartInst.draw(); });
+}
+
+// ─── CAMBIO COMIDA ────────────────────────────────────────────────────────
+
+function abrirCambio(si,di,tipo){
+  cambioTarget={si,di,tipo};
+  const pool=tipo==="desayuno"?DESAYUNOS:CENAS;
+  const current=plan[si][di][tipo];
+  let html=`<div class="modal-title">Cambiar ${tipo==="desayuno"?"desayuno":"cena"}</div>`;
+  pool.forEach(opt=>{
+    const sel=opt.id===current;
+    html+=`<button class="swap-btn"
+      style="background:${sel?"#2d6a4f":"#0b1a2e"};border:1px solid ${sel?"#52b788":"#1b4332"}"
+      onclick="hacerCambio('${opt.id}')">
+      ${sel?"✓ ":""}${opt.name}
+      <div class="swap-ings">${opt.ings.map(i=>`<span class="swap-ing">${i.item}: ${i.qty}</span>`).join("")}</div>
+    </button>`;
+  });
+  document.getElementById("modal-content").innerHTML=html;
+  document.getElementById("overlay").classList.add("active");
+}
+function hacerCambio(newId){
+  const {si,di,tipo}=cambioTarget;
+  plan[si][di][tipo]=newId;
+  guardar(); cerrarModal(); showToast("✓ Comida cambiada"); renderDia();
+}
+function cerrarModal(e){
+  if(!e||e.target.id==="overlay")
+    document.getElementById("overlay").classList.remove("active");
+}
+
+// ─── SYNC ─────────────────────────────────────────────────────────────────
+
+function exportar(){
+  try{
+    const raw=JSON.stringify({plan,cesta,pesos,pesoObj,v:2});
+    const code=btoa(encodeURIComponent(raw));
+    document.getElementById("code-box").textContent=code;
+    document.getElementById("code-box").style.display="block";
+    document.getElementById("btn-copiar").style.display="block";
+  }catch{ showToast("Error al exportar"); }
+}
+function copiar(){
+  const txt=document.getElementById("code-box").textContent;
+  navigator.clipboard.writeText(txt)
+    .then(()=>showToast("✓ Copiado"))
+    .catch(()=>{ const el=document.getElementById("code-box"); const r=document.createRange(); r.selectNodeContents(el); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); showToast("Seleccionado — usa Cmd+C para copiar"); });
+}
+function importar(){
+  const txt=document.getElementById("imp-textarea").value.trim();
+  const errEl=document.getElementById("imp-error");
+  try{
+    errEl.textContent="";
+    const raw=decodeURIComponent(atob(txt));
+    const data=JSON.parse(raw);
+    if(!data.plan||!data.cesta) throw new Error();
+    plan=data.plan; cesta=data.cesta;
+    if(data.pesos) pesos=data.pesos;
+    if(data.pesoObj) pesoObj=data.pesoObj;
+    guardar();
+    document.getElementById("imp-textarea").value="";
+    document.getElementById("code-box").style.display="none";
+    showToast("✓ Datos importados"); irA("plan");
+  }catch{ errEl.textContent="Código inválido. Cópialo completo sin espacios extra."; }
+}
+
+// ─── RENDERS ──────────────────────────────────────────────────────────────
+
+function renderPlan(){
+  let html=`<div class="hero">
+    <div class="hero-emoji">🥑</div>
+    <div><div class="hero-title">Dieta Mensual</div>
+    <div class="hero-sub">Plan personalizado · 4 semanas · 28 días</div></div>
+  </div>`;
+  plan.forEach((sem,si)=>{
+    html+=`<div class="sem-block">
+      <div class="sem-row">
+        <span class="sem-label">Semana ${si+1}</span>
+        <button class="btn-sm" onclick="addSemana(${si})">🛒 Añadir semana</button>
+      </div><div class="grid">`;
+    sem.forEach((dia,di)=>{
+      const b=getD(dia.desayuno),d=getC(dia.cena);
+      html+=`<div class="dia-card" onclick="verDia(${si},${di})">
+        <div class="dia-dia">${DIAS[di]}</div>
+        <div class="dia-num">Día ${dia.n+1}</div>
+        <div class="dia-pill">🌅 ${b?.name.split(" ").slice(0,3).join(" ")}…</div>
+        <div class="dia-pill">🌙 ${d?.name.split(" ").slice(0,3).join(" ")}…</div>
+        <div class="dia-ver">Ver →</div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  document.getElementById("v-plan").innerHTML=html;
+}
+
+function verDia(si,di){ diaActual={si,di}; renderDia(); irA("dia"); }
+
+function renderDia(){
+  if(!diaActual) return;
+  const {si,di}=diaActual;
+  const dia=plan[si][di];
+  const b=getD(dia.desayuno),d=getC(dia.cena);
+  let html=`<button class="back-btn" onclick="irA('plan')">← Volver</button>
+  <div class="titulo">${DIAS[di]} · Día ${dia.n+1}</div><br>`;
+  [{label:"🌅 Desayuno / 1ª comida",meal:b,tipo:"desayuno"},
+   {label:"🌙 Cena",meal:d,tipo:"cena"}].forEach(({label,meal,tipo})=>{
+    html+=`<div class="card">
+      <div class="card-header">
+        <span class="card-lbl">${label}</span>
+        <button class="btn-cambiar" onclick="abrirCambio(${si},${di},'${tipo}')">⇄ Cambiar</button>
+      </div>
+      <div class="meal-name">${meal?.name}</div>
+      <div class="ing-grid">${chips(meal?.ings||[])}</div>
+      <button class="btn-sm" onclick='addToCesta(${JSON.stringify(meal?.ings||[])})'>+ Añadir a cesta</button>
+    </div>`;
+  });
+  html+=`<div class="card">
+    <div class="card-lbl">💊 Post entrenamiento (siempre)</div>
+    <div class="ing-grid">${chips(POST)}</div>
+  </div>
+  <button class="btn-verde" onclick="addDia(${si},${di})">🛒 Añadir todo el día a la cesta</button>`;
+  document.getElementById("v-dia").innerHTML=html;
+}
+
+function renderCesta(){
+  const pend=cesta.filter(c=>!c.done), hecho=cesta.filter(c=>c.done);
+  let html=`<div class="titulo">🛒 Cesta de la Compra</div>
+  <div class="sub">${pend.length} pendientes · ${hecho.length} conseguidos</div>
+  <div class="add-row">
+    <input class="add-input" id="add-input" placeholder="Añadir producto…"
+      onkeydown="if(event.key==='Enter')addManual()">
+    <button class="add-btn" onclick="addManual()">+</button>
+  </div>`;
+  if(cesta.length===0) html+=`<div class="empty"><div style="font-size:48px;margin-bottom:8px">🛍️</div><div>La cesta está vacía</div><div style="font-size:12px;margin-top:4px">Abre un día y añade ingredientes</div></div>`;
+  pend.forEach(item=>{
+    html+=`<div class="cesta-row">
+      <button class="chk" onclick="toggleCesta(${item.id})">☐</button>
+      <span class="cesta-name">${item.name}</span>
+      ${item.qty?`<span class="cesta-qty">${item.qty}</span>`:""}
+      <button class="del-btn" onclick="borrarItem(${item.id})">✕</button>
+    </div>`;
+  });
+  if(hecho.length>0){
+    html+=`<div class="divider">✓ Conseguidos</div>`;
+    hecho.forEach(item=>{
+      html+=`<div class="cesta-row" style="opacity:.4">
+        <button class="chk" style="color:#52b788" onclick="toggleCesta(${item.id})">☑</button>
+        <span class="cesta-name" style="text-decoration:line-through">${item.name}</span>
+        ${item.qty?`<span class="cesta-qty">${item.qty}</span>`:""}
+        <button class="del-btn" onclick="borrarItem(${item.id})">✕</button>
+      </div>`;
+    });
+    html+=`<button class="btn-rojo" onclick="borrarChecked()">Eliminar conseguidos</button>`;
+  }
+  document.getElementById("v-cesta").innerHTML=html;
+  updateNavCesta();
+}
+
+function renderPeso(){
+  const pesosSorted=[...pesos].sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const ultimo = pesosSorted.length>0 ? pesosSorted[pesosSorted.length-1].kg : null;
+  const primero= pesosSorted.length>0 ? pesosSorted[0].kg : null;
+  const diff   = (ultimo!==null&&primero!==null) ? (ultimo-primero).toFixed(1) : null;
+  const obj    = pesoObj.objetivo;
+
+  // stats
+  let statsHtml=`<div class="peso-stats">
+    <div class="stat-box">
+      <div class="stat-val">${ultimo!==null?ultimo+"":"–"}</div>
+      <div class="stat-unit">kg</div>
+      <div class="stat-lbl">Peso actual</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:${diff===null?"#b7e4c7":parseFloat(diff)<0?"#52b788":"#e63946"}">${diff!==null?(parseFloat(diff)>0?"+":"")+diff:"–"}</div>
+      <div class="stat-unit">kg</div>
+      <div class="stat-lbl">Total perdido</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val" style="color:#e9c46a">${obj?obj+"":"–"}</div>
+      <div class="stat-unit">kg</div>
+      <div class="stat-lbl">Objetivo</div>
+    </div>
+  </div>`;
+
+  // objetivo input
+  let objHtml=`<div class="card">
+    <div class="card-lbl">🎯 Establecer objetivo de peso</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input class="add-input" id="inp-objetivo" type="number" step="0.1" placeholder="ej. 70"
+        value="${obj||""}" style="font-size:16px;text-align:center">
+      <button class="btn-sm" onclick="guardarObjetivo()">Guardar</button>
+    </div>
+  </div>`;
+
+  // form
+  let formHtml=`<div class="peso-form">
+    <div class="card-lbl">📝 Registrar peso de hoy</div>
+    <div class="peso-inputs">
+      <div class="peso-input-wrap">
+        <label>Peso (kg)</label>
+        <input class="peso-input" id="inp-kg" type="number" step="0.1" placeholder="70.5">
+      </div>
+      <div class="peso-input-wrap">
+        <label>Fecha</label>
+        <input class="peso-input" id="inp-fecha" type="date" value="${hoy()}">
+      </div>
+      <div class="peso-input-wrap" style="flex:2">
+        <label>Nota (opcional)</label>
+        <input class="add-input" id="inp-nota" placeholder="ej. tras entreno" style="height:38px">
+      </div>
+    </div>
+    <button class="btn-verde" style="margin-top:12px" onclick="guardarPeso()">✓ Guardar peso</button>
+  </div>`;
+
+  // gráfica
+  let chartHtml=`<div class="chart-wrap">
+    <div class="chart-title">📈 Evolución del peso</div>
+    <canvas id="pesoChart" style="${pesosSorted.length<1?"display:none":""}"></canvas>
+    ${pesosSorted.length<1?`<div style="text-align:center;padding:30px 0;color:#52b788;font-family:sans-serif;font-size:13px">Añade tu primer peso para ver la gráfica</div>`:""}
+  </div>`;
+
+  // historial
+  let histHtml=`<div class="card">
+    <div class="card-lbl">📋 Historial</div>`;
+  if(pesosSorted.length===0){
+    histHtml+=`<div style="color:#74c69d;font-family:sans-serif;font-size:13px;padding:10px 0">Sin registros aún</div>`;
+  } else {
+    const rev=[...pesosSorted].reverse();
+    rev.forEach((p,i)=>{
+      const prev=rev[i+1];
+      const dif=prev?(p.kg-prev.kg).toFixed(1):null;
+      const difColor=dif===null?"":parseFloat(dif)<0?"#52b788":parseFloat(dif)>0?"#e63946":"#74c69d";
+      const difTxt=dif===null?"–":(parseFloat(dif)>0?"+":"")+dif+" kg";
+      histHtml+=`<div class="peso-row">
+        <span class="peso-fecha">${fmtFecha(p.fecha)}</span>
+        <span class="peso-kg">${p.kg} kg</span>
+        <span class="peso-diff" style="color:${difColor}">${difTxt}</span>
+        <span class="peso-nota">${p.nota||""}</span>
+        <button class="del-btn" onclick="borrarPeso(${p.id})">✕</button>
+      </div>`;
+    });
+  }
+  histHtml+=`</div>`;
+
+  document.getElementById("v-peso").innerHTML =
+    `<div class="titulo">⚖️ Control de Peso</div><div class="sub">Registra y visualiza tu progreso</div>`
+    + statsHtml + objHtml + formHtml + chartHtml + histHtml;
+
+  // draw chart after DOM update
+  setTimeout(drawChart, 50);
+}
+
+function renderSync(){
+  const html=`<div class="titulo">🔄 Sincronizar dispositivos</div>
+  <div class="sub">Transfiere tu plan, cesta y registros de peso entre Mac e iPhone.</div>
+  <div class="card">
+    <div class="card-lbl">PASO 1 · Exportar desde este dispositivo</div>
+    <button class="btn-verde" onclick="exportar()">📤 Generar código</button>
+    <div id="code-box" class="code-box" style="display:none"></div>
+    <button id="btn-copiar" class="btn-copiar" style="display:none;margin-top:0" onclick="copiar()">📋 Copiar código</button>
+    <div class="hint">💡 Mándatelo por iMessage a ti mismo y pégalo en el otro dispositivo</div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div class="card-lbl">PASO 2 · Importar en este dispositivo</div>
+    <textarea class="sync-textarea" id="imp-textarea" rows="4" placeholder="Pega aquí el código…"></textarea>
+    <div id="imp-error" class="err-msg"></div>
+    <button class="btn-verde" style="margin-top:10px" onclick="importar()">📥 Importar datos</button>
+  </div>
+  <div class="card" style="margin-top:12px;background:#060d1a">
+    <div class="card-lbl">💡 Paso a paso fácil</div>
+    <div class="sub" style="margin:0">
+      1. En el Mac pulsa "Generar código" y luego "Copiar código"<br>
+      2. Abre iMessage → mándatelo a ti mismo<br>
+      3. En el iPhone abre el mensaje, mantén pulsado el código y cópialo<br>
+      4. Aquí en el iPhone pégalo arriba y pulsa "Importar datos"
+    </div>
+  </div>`;
+  document.getElementById("v-sync").innerHTML=html;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+renderPlan();
+updateNavCesta();
+</script>
+</body>
+</html>
